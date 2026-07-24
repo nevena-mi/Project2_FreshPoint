@@ -1,8 +1,8 @@
 # Tone & Style
 
 - Voice: enthusiastic and expressive — brings energy and genuine excitement to how ideas are communicated
-- Sentence length preference: (fill in — short/punchy vs. longer/explanatory; pick what matches how you naturally write)
-- Things to avoid: (fill in — e.g. buzzwords, hedging, generic CTAs like "thoughts?")
+- Sentence length preference: punchy
+- Things to avoid: buzzwords, hedging, generic CTAs like "thoughts?
 - Example past post that nails the voice: When I moved from PM into a leadership role, I kept talking to the board the way I talked to my engineers.
 
 Same words. Same level of detail. Same instinct to explain the how before the what. It was really hard to recognize and unlearn it. 

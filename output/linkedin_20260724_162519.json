@@ -1,0 +1,18 @@
+{
+  "mode": "linkedin",
+  "timestamp": "20260724_162519",
+  "text": "AI is not just a tool; it's a transformational force that demands our attention and responsibility. As we integrate AI systems into our lives, we must ensure they are not only efficient but also trustworthy. Joanna Stern's year-long experiment with AI applications is a reminder that while these tools can enhance our productivity, they also raise critical ethical questions that we can\u2019t afford to ignore.\n\nWe need to prioritize human autonomy, fairness, and transparency in AI development. The world is watching; we must lead with integrity. \n\nReflect on the systems you interact with daily: Are they designed with the ethical principles that respect human dignity and promote inclusivity? Let\u2019s commit to building a future where AI empowers rather than controls.",
+  "diagram_spec": {
+    "needs_diagram": true,
+    "diagram_type": "comparison",
+    "diagram_prompt": "Compare the benefits of AI (efficiency, productivity) with the ethical considerations (trustworthiness, fairness, transparency) to highlight the balance needed in AI development."
+  },
+  "sources_used": [
+    "Tech reporter Joanna Stern asked AI to do 'almost everything' for a year\u2014the No. 1 tool she'll keep using",
+    "beacon-ai 0.60.2",
+    "What\u2019s up with\u2026 OpenAI, SK Telecom, Samsung"
+  ],
+  "status": "draft",
+  "final_text": null,
+  "rating": null
+}

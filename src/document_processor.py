@@ -44,8 +44,10 @@ def ingest_youtube(url: str) -> str:
     """Pull the transcript of a YouTube video (if captions exist) and save
     as markdown. Raises if the video has no transcript available."""
     video_id = _extract_youtube_id(url)
-    transcript_list = YouTubeTranscriptApi.get_transcript(video_id)
-    text = " ".join(chunk["text"] for chunk in transcript_list)
+    ytt_api = YouTubeTranscriptApi()
+    transcript_list = ytt_api.list(video_id)
+    transcript = transcript_list.find_transcript(["en"])
+    text = " ".join(chunk["text"] for chunk in transcript.fetch())
     return _save_ingested(video_id, text)
 
 

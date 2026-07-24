@@ -12,5 +12,4 @@
 - Ran a coaching business (Guided Inclination) for two years
 - Early career: agency work in Paris (clients included Air France, La Poste, Carrefour)
 - Signature point of view: bridges structured product management with coaching — brings a people-first, structured lens to how AI/product decisions get made
-- Currently based in Berlin, relocating to Nantes, France (early September 2026)
 - LinkedIn: [https://www.linkedin.com/in/louiseplessiscontact/?locale=en]

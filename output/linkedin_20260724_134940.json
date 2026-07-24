@@ -1,0 +1,18 @@
+{
+  "mode": "linkedin",
+  "timestamp": "20260724_134940",
+  "text": "In the whirlwind of AI advancements, we often forget the most crucial element in product management: the human experience. As I transition into AI consulting, I'm determined to bridge the structured frameworks of product management with a people-first approach. \n\nJust recently, I led a workshop where we dissected user feedback on our AI features. The insights were staggering\u2014people crave simplicity and clarity over complexity. This echoes a lesson I learned at CoachHub: cutting onboarding steps from 15 to just 4 dramatically improved user engagement. \n\nWe can marvel at the technical prowess of AI\u2014like Google\u2019s massive stake in SpaceX\u2014but if we don\u2019t prioritize the user\u2019s journey, we risk losing touch with our core mission. \n\nSo, as we build the AI products of tomorrow, let\u2019s make sure we\u2019re not just adding features, but truly enhancing lives. \n\nReflect on this: How can we ensure that our AI innovations are genuinely user-centric?",
+  "diagram_spec": {
+    "needs_diagram": true,
+    "diagram_type": "comparison",
+    "diagram_prompt": "A comparison diagram showing the difference between a complex onboarding process and a simplified one, highlighting user engagement metrics."
+  },
+  "sources_used": [
+    "Google holds $94B in SpaceX shares after IPO as lockup restrictions kick in",
+    "The US Army built a nuclear-powered city inside the Greenland ice sheet as cover for a plan to run 600 missiles through 4,000 km of tunnels beneath it; Denmark found out in 1997",
+    "Bernstein says Bitcoin mining deals necessary for AI power crunch"
+  ],
+  "status": "draft",
+  "final_text": null,
+  "rating": null
+}
