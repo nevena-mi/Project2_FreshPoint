@@ -9,6 +9,7 @@ from dataclasses import dataclass
 
 from src.llm_integration import complete
 from src.prompt_templates import LINKEDIN_TEMPLATE, NEWSLETTER_TEMPLATE
+from src.editor import refine_post
 
 
 @dataclass
@@ -63,7 +64,12 @@ def generate_post(mode: str, kb, news_items, angle: str | None = None, news_only
         news_context=news_context,
         news_requirement=news_requirement,
     )
-    text = complete(prompt)
+    draft = complete(prompt)
+
+    # Second pass: a narrow editing checklist (generic openers/endings,
+    # em-dashes, buzzwords) instead of relying on the single generation
+    # prompt to catch everything at once — see editor.py for why.
+    text = refine_post(draft)
 
     sources_used = [selected_news_item.title] if selected_news_item else []
     return GeneratedPost(text=text, sources_used=sources_used)

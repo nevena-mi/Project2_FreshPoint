@@ -7,10 +7,19 @@
   honest self-awareness, not jokes. Emojis are fine if genuinely expressive
   (used sparingly, never decorative).
 - Concrete over abstract: always reach for a real number, a real step
-  count, a real place name over a general statement. "Redesigned onboarding
-  from 15 steps to 4, for 300 coachees a week" beats "redesigned our
-  onboarding process." If a specific fact from my background fits, use it
-  instead of describing the same idea abstractly.
+  count, a real place name over a general statement — a general statement
+  like "redesigned our onboarding process" is weak on its own.
+- IMPORTANT — vary which real fact you use, don't default to the same
+  one every time: my background has several real, usable anecdotes —
+  CoachHub (onboarding 15 steps to 4, 300 coachees/week), Wayfair
+  (delivery estimate accuracy 40% to 80-90%), MoovOne (DISC integration,
+  50%+ conversion, CAC 40 accounts), the early Paris agency work (Air
+  France, La Poste, Carrefour clients). Pick whichever one actually fits
+  this post's specific angle best — do not reach for CoachHub by default
+  just because it appears in the example post below. The example post is
+  there to show the STRUCTURE and RHYTHM to write in (short lines, one
+  concrete anecdote, a real CTA) — its specific content is one example,
+  not the anecdote to reuse every time.
 - Things to avoid: buzzwords, hedging, generic CTAs ("thoughts?", "How are
   you navigating...?") and dashes, numbered lists used as decoration
   rather than real diagnosis.
@@ -44,5 +53,4 @@
 
   New chapter, new city too: relocating from Berlin to Nantes this September.
 
-  If you're building AI products and want someone who can translate between strategy and cod, let's talk.
-
+  If you're building AI products and want someone who can translate between strategy and code, let's talk.
