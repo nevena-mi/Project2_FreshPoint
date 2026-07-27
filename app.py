@@ -69,6 +69,13 @@ with tab_sources:
         saved_path = ingest_youtube(yt_url)
         st.success(f"Transcript ingested — saved to {saved_path}")
 
+    st.divider()
+    st.write("Refresh the chunked secondary KB export for operational use.")
+    if st.button("Refresh chunk export"):
+        kb = KnowledgeBase(primary_dir="knowledge_base/primary", secondary_dir="knowledge_base/secondary")
+        export_path = kb.export_secondary_chunks()
+        st.success(f"Chunk export written to {export_path}")
+
 with tab_favorites:
     st.write("Add topics you like or articles you consider a good example of your voice.")
     fav_entry = st.text_input("New favorite (topic or article title + link)")

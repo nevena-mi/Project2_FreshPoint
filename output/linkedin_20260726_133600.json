@@ -1,0 +1,14 @@
+{
+  "mode": "linkedin",
+  "timestamp": "20260726_133600",
+  "text": "Transitioning from a PM role to a leadership position means unlearning and adapting how we communicate. I\u2019ve learned the hard way that it\u2019s not just about the details; it\u2019s about the impact. \n\nI used to drown my audience in process\u2014metrics, steps, and jargon. But what they needed was clarity and outcomes. For instance, instead of saying, \"We validated our hypothesis through customer interviews,\" I should have articulated, \"This change will reduce churn and keep our customers happy.\" \n\nOwning decisions is crucial too. When a feature slipped, my instinct was to explain the technical debt. But what my leadership team needed was accountability: \"I chose to delay this to protect a major release.\" \n\nAs I dive deeper into AI and product management, I\u2019m realizing that effective communication is about connecting the dots between technical details and business impact. \n\nReflect on your own experiences: how can you shift your narrative to resonate more with your audience?",
+  "diagram_spec": {
+    "needs_diagram": true,
+    "diagram_type": "comparison",
+    "diagram_prompt": "A comparison diagram showing the difference between detail-oriented communication and impact-focused communication."
+  },
+  "sources_used": [],
+  "status": "draft",
+  "final_text": null,
+  "rating": null
+}

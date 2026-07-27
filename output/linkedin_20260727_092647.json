@@ -1,0 +1,14 @@
+{
+  "mode": "linkedin",
+  "timestamp": "20260727_092647",
+  "text": "When I transitioned from a product management role to a leadership position, I faced a steep learning curve I hadn\u2019t anticipated. I realized that the language I used with my engineers didn't translate to the boardroom. Here\u2019s what I learned the hard way:\n\n1\ufe0f\u20e3 **Focus on impact, not process.** I once detailed our discovery rounds and customer interviews, oblivious to the fact that my audience only cared about the outcome: reducing churn. \n\n2\ufe0f\u20e3 **Own your decisions.** I found myself explaining delays as technical setbacks instead of owning the decisions that led to them. It\u2019s empowering to say, \u201cI chose this path to protect our key release.\u201d\n\n3\ufe0f\u20e3 **Know your audience.** I often mixed up messages to teams and stakeholders, leading to confusion. Tailoring your communication is crucial.\n\nThese lessons are foundational, especially as we delve into AI and data-driven products where clarity and alignment are paramount. \n\nReflect on your journey: what communication pitfalls have you navigated?",
+  "diagram_spec": {
+    "needs_diagram": true,
+    "diagram_type": "comparison",
+    "diagram_prompt": "A comparison diagram illustrating the differences between communication styles in product management vs. leadership roles."
+  },
+  "sources_used": [],
+  "status": "draft",
+  "final_text": null,
+  "rating": null
+}

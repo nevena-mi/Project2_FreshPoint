@@ -14,6 +14,8 @@ from pathlib import Path
 from datetime import datetime
 import json
 
+from src.chunker import chunk_secondary_corpus, export_chunks_jsonl
+
 
 @dataclass
 class KnowledgeBase:
@@ -21,10 +23,12 @@ class KnowledgeBase:
     secondary_dir: str
     primary_docs: dict = field(default_factory=dict)
     secondary_docs: dict = field(default_factory=dict)
+    secondary_chunks: list = field(default_factory=list)
 
     def load(self) -> None:
         self.primary_docs = self._load_dir(self.primary_dir)
         self.secondary_docs = self._load_dir(self.secondary_dir)
+        self.secondary_chunks = self._load_secondary_chunks()
 
     @staticmethod
     def _load_dir(dir_path: str) -> dict:
@@ -32,6 +36,10 @@ class KnowledgeBase:
         for path in Path(dir_path).rglob("*.md"):
             docs[path.stem] = path.read_text(encoding="utf-8")
         return docs
+
+    def _load_secondary_chunks(self) -> list:
+        """Chunk secondary markdown into deterministic, embedding-ready units."""
+        return chunk_secondary_corpus(Path(self.secondary_dir))
 
     def add_favorite(self, entry: str) -> None:
         """Append a favorite topic or article to knowledge_base/primary/favorites.md
@@ -65,8 +73,23 @@ class KnowledgeBase:
         return "\n\n".join(f"## {name}\n{text}" for name, text in self.primary_docs.items())
 
     def secondary_context(self) -> str:
-        """Concatenate all secondary docs for prompt injection."""
+        """Concatenate all secondary chunks for prompt injection."""
+        if self.secondary_chunks:
+            ordered_chunks = sorted(
+                self.secondary_chunks,
+                key=lambda chunk: (chunk.source_path, chunk.section_index, chunk.chunk_index),
+            )
+            return "\n\n".join(chunk.text for chunk in ordered_chunks)
+
+        # Fallback for callers that have not loaded the KB yet.
         return "\n\n".join(f"## {name}\n{text}" for name, text in self.secondary_docs.items())
+
+    def export_secondary_chunks(self, out_path: str | Path = "output/secondary_chunks.jsonl") -> str:
+        """Write the chunked secondary KB to JSONL for inspection or later embedding."""
+        if not self.secondary_chunks:
+            self.secondary_chunks = self._load_secondary_chunks()
+        export_chunks_jsonl(self.secondary_chunks, Path(out_path))
+        return str(out_path)
 
     def save_output(self, post, mode: str) -> None:
         """Persist generated content for the iterate stage / human review."""
