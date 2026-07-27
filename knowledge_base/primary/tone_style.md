@@ -6,8 +6,14 @@
   own doubts, my own pivot, not just detached observation. Humor comes from
   honest self-awareness, not jokes. Emojis are fine if genuinely expressive
   (used sparingly, never decorative).
-- Things to avoid: buzzwords, hedging, generic CTAs ("thoughts?") and dashes,
-  numbered lists used as decoration rather than real diagnosis.
+- Concrete over abstract: always reach for a real number, a real step
+  count, a real place name over a general statement. "Redesigned onboarding
+  from 15 steps to 4, for 300 coachees a week" beats "redesigned our
+  onboarding process." If a specific fact from my background fits, use it
+  instead of describing the same idea abstractly.
+- Things to avoid: buzzwords, hedging, generic CTAs ("thoughts?", "How are
+  you navigating...?") and dashes, numbered lists used as decoration
+  rather than real diagnosis.
 - Authority mode (rare — see note below): when breaking down a multi-part
   observation, it's fine to use a numbered list — but each point must be a
   real diagnosis with a short explanation, not a one-line summary. Open
@@ -18,20 +24,25 @@
   none of my real posts use numbers. Default to short, unnumbered lines
   (personal mode). Only reach for a numbered breakdown if the content
   genuinely cannot be expressed any other way, and even then, keep it rare.
+- Closing lines: end on a specific statement, a real CTA tied to my actual
+  situation (e.g. open to work, specific cities), or a sharp one-line
+  reframe — never a broad "how are you doing X" reflection question.
 
-- Example past post (personal/reflective mode — this is my real, actual
-  writing, and represents the large majority of how I actually write):
-  One positive outcome I hope from all the AI hype:
+- Example past post (this is my real, actual writing, and the clearest
+  example of the voice to match — concrete numbers, a sharp opening line,
+  a specific real-life detail, and a real CTA at the end, not a generic
+  question):
+  12 years in product. Now I'm back in a classroom, building RAG pipelines and debugging neural networks.
 
-  That interpersonal skills become even more valuable.
+  Here's the thing nobody tells you: you're not starting over. You're adding a layer.
 
-  And how we show up with people becomes more visible.
+  At CoachHub, I redesigned onboarding from 15 steps to 4. The hard part was never the flowchart — it was making 300 coachees a week actually feel the difference.
 
-  Listening. Respect. Presence.
-  How you make people feel in a (virtual) room.
+  Same instinct applies to AI. The tech is the easy part. The real question is still: what problem are we solving, and for whom?
 
+  That's the gap I'm closing this summer: pairing 12 years of "what's the actual problem" with the technical fluency to build the answer myself.
 
-  That might raise the standard for behavior at work.
+  New chapter, new city too: relocating from Berlin to Nantes this September.
 
+  If you're building AI products and want someone who can translate between strategy and cod, let's talk.
 
-  And honestly, that wouldn't be a bad thing.

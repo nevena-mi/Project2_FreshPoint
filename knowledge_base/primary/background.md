@@ -1,22 +1,35 @@
-# Background
+# background
 
-- Role: Senior/Lead Product Manager with 12+ years of experience across B2C and B2B SaaS, now transitioning into Data/AI Product Management and AI consulting
-- Currently completing an AI Consulting and Integration bootcamp (Ironhack)
-- Past employers: CoachHub, Urban Sports Club, Wayfair
-- Education: MBA from Grenoble École de Management
-- Certification: ICF ACC certified coach (300+ hours), and worked as a tech leadership coach
-- Early career: agency work in Paris (clients included Air France, La Poste, Carrefour)
-- Ran a coaching business (The Positively Inclined) for two years
 
-## Career highlights (concrete, usable in posts)
-- Led a tribe of 35 people across 4 squads with 4 POs (CoachHub)
-- Redesigned onboarding from 15 to 4 steps, serving ~200–300 coachees/week (CoachHub)
-- Improved delivery estimate accuracy from ~40% to 80–90% (Wayfair)
-- Drove 50%+ client conversion via a DISC integration, including CAC 40 accounts (MoovOne)
+- At CoachHub, I redesigned onboarding from 15 steps down to 4 — serving
+  200-300 coachees a week. The hard part wasn't the flowchart, it was
+  making people feel guided, not processed, through a faster process.
 
-## Current chapter
-- Actively job searching for AI PM and AI consulting roles
+- Also at CoachHub, I led a tribe of 35 people across 4 squads with 4 POs —
+  learned what actually breaks (and what holds) when you scale
+  coordination across that many moving parts.
 
-## Signature point of view
-- Bridges structured product management with coaching — brings a people-first, structured lens to how AI and product decisions get made
-- Believes the hardest part of adopting AI in a team or product isn't the technology, it's the people and process around it
+- At Wayfair, I took delivery estimate accuracy from ~40% to 80-90%.
+  That's the kind of unglamorous, unsexy metric that quietly rebuilds
+  customer trust.
+
+- At MoovOne, integrating DISC into the product converted over 50% of
+  clients — including CAC 40 accounts. Proof that "soft" psychological
+  frameworks can move very hard numbers.
+
+- I ran my own coaching business, Guided Inclination, for two years, and
+  hold an ICF ACC certification (300+ hours). Coaching taught me to
+  listen for what people aren't saying — a skill that transfers directly
+  to product discovery.
+
+- Early in my career, I worked agency-side in Paris on accounts like Air
+  France, La Poste, and Carrefour — learned how to translate ideas for
+  people who didn't ask for them and weren't sure they wanted them.
+
+- I'm now doing an AI Consulting & Integration bootcamp , hands-on with
+  RAG pipelines, prompt engineering, and model evaluation , while job
+  searching for Data/AI PM and AI consulting roles.
+
+- Recurring tension worth naming honestly: the pull between stable
+  corporate PM work and the more personally aligned but less certain
+  paths (coaching, wellness). I don't pretend that's resolved.
