@@ -32,7 +32,11 @@ def generate_post(mode: str, kb, news_items, angle: str | None = None, news_only
 
     template = LINKEDIN_TEMPLATE if mode == "linkedin" else NEWSLETTER_TEMPLATE
 
-    news_context = _chunk_and_select(news_items) or (
+    selected_news_item = _select_best_news_item(news_items, angle)
+    news_context = _chunk_and_select(
+        [selected_news_item] if news_only and selected_news_item else news_items,
+        selected_news_item,
+    ) or (
         "No fresh news items this run — write from KB context alone."
     )
 
@@ -59,17 +63,38 @@ def generate_post(mode: str, kb, news_items, angle: str | None = None, news_only
         news_context=news_context,
         news_requirement=news_requirement,
     )
-    print(prompt)
     text = complete(prompt)
 
-    sources_used = [item.title for item in news_items]
+    sources_used = [selected_news_item.title] if selected_news_item else []
     return GeneratedPost(text=text, sources_used=sources_used)
 
 
 MAX_SNIPPET_CHARS = 240
 
 
-def _chunk_and_select(news_items) -> str:
+def _select_best_news_item(news_items, angle: str | None):
+    """Pick the most relevant fetched article for the user angle.
+
+    Uses simple keyword overlap so selection is deterministic and cheap.
+    """
+    if not news_items:
+        return None
+    if not angle or not angle.strip():
+        return news_items[0]
+
+    angle_tokens = _tokenize(angle)
+    if not angle_tokens:
+        return news_items[0]
+
+    def score(item) -> tuple[int, int]:
+        text = f"{item.title} {item.summary} {item.source}".lower()
+        matched = sum(1 for token in angle_tokens if token in text)
+        return matched, -len(item.title)
+
+    return max(news_items, key=score)
+
+
+def _chunk_and_select(news_items, selected_item=None) -> str:
     """Trim each fetched article down to its most relevant snippet.
 
     This is the 'chunking' step from the pipeline sketch: not vector-DB
@@ -80,9 +105,29 @@ def _chunk_and_select(news_items) -> str:
     it becomes worth more once you fetch longer or more numerous sources.
     """
     lines = []
-    for item in news_items:
+    ordered_items = list(news_items)
+    if selected_item and selected_item in ordered_items:
+        ordered_items.remove(selected_item)
+        ordered_items.insert(0, selected_item)
+
+    for item in ordered_items:
         snippet = item.summary.strip()
         if len(snippet) > MAX_SNIPPET_CHARS:
             snippet = snippet[:MAX_SNIPPET_CHARS].rsplit(" ", 1)[0] + "..."
         lines.append(f"- {item.title} ({item.source}): {snippet}")
     return "\n".join(lines)
+
+
+def _tokenize(text: str) -> list[str]:
+    tokens = []
+    current = []
+    for char in text.lower():
+        if char.isalnum():
+            current.append(char)
+        else:
+            if len(current) >= 3:
+                tokens.append("".join(current))
+            current = []
+    if len(current) >= 3:
+        tokens.append("".join(current))
+    return tokens

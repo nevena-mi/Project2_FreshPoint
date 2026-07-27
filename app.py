@@ -4,10 +4,12 @@ app.py — Streamlit UI for FreshPoint.
 Run with:
     streamlit run app.py
 
-Two tabs:
-  - Generate: trigger the pipeline for LinkedIn or newsletter mode
-  - Review:   see past posts, mark one as the final/published version
-              (with edits), and rate it green/orange/red
+Three top-level tabs:
+  - Generate & Review: contains three sub-tabs — General Post, Post from
+    News, Newsletter — each with exactly one action/button, no shared
+    mode-toggle across them.
+  - Add Sources:        PDF / article URL / YouTube ingestion
+  - Feedback:           review posts marked final, rate them, mark final version
 """
 
 import streamlit as st
@@ -15,7 +17,7 @@ from pathlib import Path
 from datetime import datetime
 
 from src.knowledge_base import KnowledgeBase
-from src.news_fetcher import fetch_daily_news
+from src.news_fetcher import fetch_news_for_query
 from src.content_pipeline import generate_post
 from src.feedback import list_posts, mark_as_final, rate_post, mark_voice_example_added
 from src.document_processor import ingest_pdf, ingest_youtube, ingest_url_article
@@ -23,8 +25,7 @@ from src.document_processor import ingest_pdf, ingest_youtube, ingest_url_articl
 st.set_page_config(page_title="FreshPoint", layout="centered")
 st.title("FreshPoint")
 
-# Load once so both the Generate and Add Sources tabs can offer the same
-# topic list in their dropdowns.
+# Load once so every tab that needs a topic list uses the same one.
 _kb_for_topics = KnowledgeBase(primary_dir="knowledge_base/primary", secondary_dir="knowledge_base/secondary")
 _kb_for_topics.load()
 TOPICS = _kb_for_topics.get_topics()
@@ -46,85 +47,125 @@ def _post_label(post: dict) -> str:
 
     return f"{date_str} — {title}" if title else f"{date_str} — ({post.get('mode', 'post')})"
 
-tab_generate, tab_sources, tab_review = st.tabs(
+
+def _draft_review_block(state_prefix: str) -> None:
+    """Shared 'review + mark as final' block, used by all three generate
+    sub-tabs. state_prefix keeps each sub-tab's draft in its own
+    session_state slot, so generating in one doesn't clobber another."""
+    path_key = f"{state_prefix}_draft_path"
+    text_key = f"{state_prefix}_draft_edit"
+    sources_key = f"{state_prefix}_draft_sources"
+
+    if not st.session_state.get(path_key):
+        return
+
+    st.subheader("Review draft")
+
+    sources = st.session_state.get(sources_key)
+    if sources:
+        st.caption("News sources used: " + ", ".join(sources))
+
+    st.text_area(
+        "Post text (edit before marking as final)",
+        height=250,
+        key=text_key,
+    )
+    if st.button("Mark as final / published", key=f"{state_prefix}_mark_final"):
+        mark_as_final(st.session_state[path_key], st.session_state[text_key])
+        st.success(
+            "Marked as final — rate it Good/Medium/Poor on the Feedback "
+            "tab once you know how it did; only Good posts get added to "
+            "your voice examples."
+        )
+        del st.session_state[path_key]
+        del st.session_state[text_key]
+        if sources_key in st.session_state:
+            del st.session_state[sources_key]
+
+
+tab_generate, tab_sources, tab_feedback = st.tabs(
     ["Generate & Review", "Add Sources", "Feedback"]
 )
 
 with tab_generate:
-    mode = st.radio("Content type", ["linkedin", "newsletter"], horizontal=True)
-    angle = st.text_input(
-        "What's this post actually about?",
-        placeholder="e.g. why hiring for technical skill alone misses the point",
-        help="This drives which passages get pulled from your sources — be specific.",
+    sub_general, sub_news, sub_newsletter = st.tabs(
+        ["General Post", "Post from News", "Newsletter"]
     )
 
-    col_generate, col_generate_news = st.columns(2)
-    with col_generate:
-        generate_clicked = st.button("Generate post")
-    with col_generate_news:
-        generate_news_clicked = st.button("Generate post based on the news")
-
-    if generate_clicked:
-        with st.spinner("Loading knowledge base..."):
-            kb = KnowledgeBase(
-                primary_dir="knowledge_base/primary",
-                secondary_dir="knowledge_base/secondary",
-            )
-            kb.load()
-            # KB-only path — no news fetch here. That's what the "based on
-            # the news" button is for now, so this one doesn't spend NewsAPI
-            # quota on a post that isn't asking for news.
-            post = generate_post(mode=mode, kb=kb, news_items=[], angle=angle)
-            saved_path = kb.save_output(post, mode=mode)
-
-        # Stash in session_state — the button click below triggers a rerun,
-        # so a plain local variable wouldn't survive to that point. Written
-        # directly into "generate_draft_edit", the SAME key the text_area
-        # below uses, not a separate "draft_text" key — a keyed widget
-        # ignores any value= argument once it exists, it only ever reflects
-        # session_state[key], so this has to be the single source of truth.
-        st.session_state["draft_path"] = saved_path
-        st.session_state["generate_draft_edit"] = post.text
-        st.success("Generated — review below before marking it final.")
-
-    if generate_news_clicked:
-        with st.spinner("Loading knowledge base and fetching news..."):
-            kb = KnowledgeBase(
-                primary_dir="knowledge_base/primary",
-                secondary_dir="knowledge_base/secondary",
-            )
-            kb.load()
-            news_items = fetch_daily_news(topics=TOPICS, max_items=3)
-
-        if not news_items:
-            st.error(
-                "No news articles found right now — check NEWS_API_KEY and "
-                "your NewsAPI quota, or try again shortly. Can't generate a "
-                "news-based post with nothing to react to."
-            )
-        else:
-            post = generate_post(mode=mode, kb=kb, news_items=news_items, angle=angle, news_only=True)
-            saved_path = kb.save_output(post, mode=mode)
-            st.session_state["draft_path"] = saved_path
-            st.session_state["generate_draft_edit"] = post.text
-            st.success("Generated from the news — review below before marking it final.")
-
-    if st.session_state.get("draft_path"):
-        st.subheader("Review draft")
-        edited_draft = st.text_area(
-            "Post text (edit before marking as final)",
-            height=250,
-            key="generate_draft_edit",
+    with sub_general:
+        st.write("Generate a LinkedIn post from your background and sources — no news fetch.")
+        angle_general = st.text_input(
+            "What's this post actually about?",
+            placeholder="e.g. why hiring for technical skill alone misses the point",
+            help="This drives which passages get pulled from your sources — be specific.",
+            key="angle_general",
         )
-        if st.button("Mark as final / published", key="generate_mark_final"):
-            mark_as_final(st.session_state["draft_path"], edited_draft)
-            st.success(
-                "Marked as final — rate it Good/Medium/Poor on the Feedback "
-                "tab once you know how it did; only Good posts get added to "
-                "your voice examples."
-            )
-            del st.session_state["draft_path"]
-            del st.session_state["generate_draft_edit"]
+
+        if st.button("Generate post", key="btn_generate_general"):
+            with st.spinner("Loading knowledge base..."):
+                kb = KnowledgeBase(primary_dir="knowledge_base/primary", secondary_dir="knowledge_base/secondary")
+                kb.load()
+                post = generate_post(mode="linkedin", kb=kb, news_items=[], angle=angle_general)
+                saved_path = kb.save_output(post, mode="linkedin")
+
+            st.session_state["general_draft_path"] = saved_path
+            st.session_state["general_draft_edit"] = post.text
+            st.success("Generated — review below before marking it final.")
+
+        _draft_review_block("general")
+
+    with sub_news:
+        st.write("Generate a LinkedIn post anchored on a real, fresh news article.")
+        angle_news = st.text_input(
+            "What's this post actually about?",
+            placeholder="e.g. why hiring for technical skill alone misses the point",
+            help="This drives which passages get pulled from your sources — be specific.",
+            key="angle_news",
+        )
+
+        if st.button("Generate post from news", key="btn_generate_news"):
+            with st.spinner("Loading knowledge base and fetching news..."):
+                kb = KnowledgeBase(primary_dir="knowledge_base/primary", secondary_dir="knowledge_base/secondary")
+                kb.load()
+                news_items = fetch_news_for_query(angle_news, max_items=5)
+
+            if not news_items:
+                st.error(
+                    "No news articles found right now — check NEWS_API_KEY and "
+                    "your NewsAPI quota, or try again shortly. Can't generate a "
+                    "news-based post with nothing to react to."
+                )
+            else:
+                post = generate_post(mode="linkedin", kb=kb, news_items=news_items, angle=angle_news, news_only=True)
+                saved_path = kb.save_output(post, mode="linkedin")
+                st.session_state["news_draft_path"] = saved_path
+                st.session_state["news_draft_edit"] = post.text
+                st.session_state["news_draft_sources"] = post.sources_used
+                st.success("Generated from the news — review below before marking it final.")
+
+        _draft_review_block("news")
+
+    with sub_newsletter:
+        st.write("Generate your monthly newsletter from your background and sources — no news fetch.")
+        angle_newsletter = st.text_input(
+            "What's this newsletter actually about?",
+            placeholder="e.g. what I've learned so far transitioning into AI consulting",
+            help="This drives which passages get pulled from your sources — be specific.",
+            key="angle_newsletter",
+        )
+
+        if st.button("Generate newsletter", key="btn_generate_newsletter"):
+            with st.spinner("Loading knowledge base..."):
+                kb = KnowledgeBase(primary_dir="knowledge_base/primary", secondary_dir="knowledge_base/secondary")
+                kb.load()
+                post = generate_post(mode="newsletter", kb=kb, news_items=[], angle=angle_newsletter)
+                saved_path = kb.save_output(post, mode="newsletter")
+
+            st.session_state["newsletter_draft_path"] = saved_path
+            st.session_state["newsletter_draft_edit"] = post.text
+            st.success("Generated — review below before marking it final.")
+
+        _draft_review_block("newsletter")
 
 with tab_sources:
     st.write("Add a PDF, article URL, or YouTube video as extra secondary-KB context.")
@@ -145,14 +186,14 @@ with tab_sources:
         saved_path = ingest_youtube(yt_url, source_topic)
         st.success(f"Transcript ingested — saved to {saved_path}")
 
-with tab_review:
+with tab_feedback:
     # Only posts already marked final show up here — a post has to be
-    # confirmed as posted (in the Generate & Review tab) before it's rateable.
+    # confirmed as posted before it's rateable.
     posts = list_posts(status="final")
     if not posts:
         st.write(
             "No posts marked as final yet — generate a post and confirm it "
-            "as final on the Generate & Review tab first."
+            "as final on one of the Generate & Review sub-tabs first."
         )
     else:
         labels = [_post_label(p) for p in posts]

@@ -23,15 +23,11 @@ class NewsItem:
     source: str
 
 
-def fetch_news_for_topic(topic: str, max_items: int = 10) -> list[NewsItem]:
-    """Fetch recent, relevant articles for a single topic.
+def fetch_news_for_query(query: str, max_items: int = 10) -> list[NewsItem]:
+    """Fetch recent, relevant articles for a single search query.
 
-    Fixes the two bugs found in the old fetch_daily_news:
-      1. Single-topic query instead of an OR-joined query across all topics,
-         so "AI" no longer pulls in an article that just happens to mention
-         "leadership" in passing.
-      2. sortBy=relevancy instead of publishedAt, so results are ranked by
-         match quality, not just recency.
+    Results are ranked by relevancy so the caller can pick the best match
+    for the user's angle instead of auto-selecting by recency.
 
     Returns up to max_items candidates for a human to choose from in the UI
     (see app.py tab_sources), rather than auto-selecting one. Falls back to
@@ -39,11 +35,11 @@ def fetch_news_for_topic(topic: str, max_items: int = 10) -> list[NewsItem]:
     agents.md Definition of Done re: error handling.
     """
     api_key = os.getenv("NEWS_API_KEY")
-    if not api_key or not topic:
+    if not api_key or not query:
         return []
 
     params = {
-        "q": topic,
+        "q": query,
         "language": "en",
         "sortBy": "relevancy",
         "pageSize": max_items,
@@ -68,6 +64,11 @@ def fetch_news_for_topic(topic: str, max_items: int = 10) -> list[NewsItem]:
     ]
 
 
+def fetch_news_for_topic(topic: str, max_items: int = 10) -> list[NewsItem]:
+    """Compatibility wrapper for topic-driven calls."""
+    return fetch_news_for_query(topic, max_items=max_items)
+
+
 def fetch_daily_news(topics: list[str], max_items: int = 3) -> list[NewsItem]:
     """Back-compat wrapper: fetch across multiple topics via separate
     per-topic queries (not one OR-joined query), then merge and cap.
@@ -81,7 +82,7 @@ def fetch_daily_news(topics: list[str], max_items: int = 3) -> list[NewsItem]:
     per_topic_cap = max(1, max_items // max(1, len(topics[:4])))
 
     for topic in topics[:4]:
-        for item in fetch_news_for_topic(topic, max_items=per_topic_cap):
+        for item in fetch_news_for_query(topic, max_items=per_topic_cap):
             if item.url and item.url in seen_urls:
                 continue
             seen_urls.add(item.url)

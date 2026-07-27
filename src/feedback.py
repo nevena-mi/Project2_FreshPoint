@@ -69,10 +69,3 @@ def mark_voice_example_added(post_path: str) -> None:
     record = json.loads(path.read_text(encoding="utf-8"))
     record["added_to_voice_examples"] = True
     path.write_text(json.dumps(record, indent=2), encoding="utf-8")
-
-
-def rated_posts_by_rating(rating: str) -> list[dict]:
-    """Nice-to-have hook: pull all posts with a given rating, e.g. to inspect
-    what 'good' posts have in common — the starting point for feeding
-    ratings back into future prompts."""
-    return [p for p in list_posts() if p.get("rating") == rating]

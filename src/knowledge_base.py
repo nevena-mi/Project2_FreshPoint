@@ -58,16 +58,6 @@ class KnowledgeBase:
         """Chunk secondary markdown into deterministic, embedding-ready units."""
         return chunk_secondary_corpus(Path(self.secondary_dir))
 
-    def add_favorite(self, entry: str) -> None:
-        """Append a favorite topic or article to knowledge_base/primary/favorites.md
-        so it's picked up as personal-voice context on the next load()."""
-        fav_path = Path(self.primary_dir) / "favorites.md"
-        fav_path.parent.mkdir(parents=True, exist_ok=True)
-        if not fav_path.exists():
-            fav_path.write_text("# Favorite Topics & Articles\n\n", encoding="utf-8")
-        with fav_path.open("a", encoding="utf-8") as f:
-            f.write(f"- {entry}\n")
-
     def get_topics(self) -> list[str]:
         """Extract the topic list from secondary/topics.md.
 
