@@ -10,7 +10,7 @@
   - [x] limited resources (2 days, 2 people, free/low-cost API tier)
   - [ ] interdisciplinary
   - [x] responsibility for results (graded deliverable)
-  - [x] complex (multi-stage pipeline: fetch → chunk → generate → optional diagram → store)
+  - [x] complex (multi-stage pipeline: fetch → chunk → retrieve → generate → optional diagram → store)
   - [x] novel (first time building this exact pipeline)
   - [x] defined start/end
 
@@ -42,18 +42,18 @@
 | ID | Must requirement | Maps to (file / module) | How we verify |
 |---|---|---|---|
 | M1 | Ingest primary KB markdown (background, branding, tone/style) | `knowledge_base.py` + `knowledge_base/primary/` | Run pipeline, confirm KB text appears in generated prompt |
-| M2 | Ingest secondary KB markdown (topics + sources) | `knowledge_base.py` + `knowledge_base/secondary/` | Same — topics list correctly parsed |
+| M2 | Ingest secondary KB markdown, chunk it, and retrieve the most relevant pieces for generation | `knowledge_base.py` + `src/chunker.py` + `src/embeddings.py` + `knowledge_base/secondary/` | Same — topics list correctly parsed; chunked secondary context is returned through retrieval |
 | M3 | Fetch fresh news relevant to topics | `news_fetcher.py` | Run with valid API key, confirm real articles returned; confirm graceful empty-list fallback without key |
 | M4 | Chunk/select news down to relevant snippets before prompt injection | `content_pipeline.py` (`_chunk_and_select`) | Compare raw article length vs. injected snippet length in a test run |
 | M5 | Call LLM with combined KB + news context (OpenAI primary, Cohere fallback if OpenAI fails) | `llm_integration.py` + `content_pipeline.py` | Generated post references both brand voice and a real news item; fallback path triggers correctly when OpenAI call is forced to fail |
 | M6 | Reusable prompt templates (≥2) | `prompt_templates.py` (LinkedIn + newsletter templates) | Both templates produce valid, distinct-format output |
 | M7 | End-to-end pipeline command | `main.py` | `python -m src.main --mode linkedin` and `--mode newsletter` both run without error |
 | M8 | Uniqueness evidence vs. generic ChatGPT | comparison doc/slide | Side-by-side: FreshPoint output vs. plain ChatGPT prompt on same topic |
-| M9 | RAG decision documented | `rag_decision.md` | Choice stated + ≥3 criteria addressed |
+| M9 | RAG decision documented | `rag_decision.md` | Choice stated + ≥3 criteria addressed; document matches the implemented secondary-side retrieval flow |
 | M10 | Project structured + agents guided | `project_structure.md` (this file), `agents.md` | Sections complete; agents.md referenced when prompting coding agents |
 | M11 | UI to generate and view posts | `app.py` | A team member can trigger generation and read the result without opening raw JSON |
 | M12 | Mark a post as "final/published version" (with edits) | `app.py` + `src/feedback.py` + `output/` storage | A saved post record can be edited and flagged as the actual version that was posted |
-| M13 | Ingest PDF, audio, and YouTube video as extra secondary KB sources | `src/document_processor.py` + `app.py` (Add Sources tab) | Upload one of each type, confirm a new .md file appears under `knowledge_base/secondary/ingested/` and its content shows up in the next generated post's context |
+| M13 | Ingest PDF, audio, and YouTube video as extra secondary KB sources | `src/document_processor.py` + `app.py` (Add Sources tab) | Upload one of each type, confirm a new .md file appears under `knowledge_base/secondary/ingested/`, gets chunked, and becomes eligible for retrieval in the next generated post's context |
 | M14 | Let the user record favorite topics/articles to steer content | `knowledge_base.py` (`add_favorite`) + `app.py` (Favorites tab) + `knowledge_base/primary/favorites.md` | Add a favorite via the UI, confirm it appears in `favorites.md` and in the primary KB context on next load |
 
 **Nice to have (build only once Musts M1–M14 are green):**
@@ -67,7 +67,7 @@
 
 | Won't | Why deferred |
 |---|---|
-| Full vector RAG stack (embeddings, vector DB) | Corpus is small and personal; live news fetch + light chunking covers freshness without the added build cost — see `rag_decision.md` |
+| Full vector RAG stack expansion beyond the current secondary KB retrieval (for example, swapping vector stores or adding broader multi-source indexing) | Current retrieval already covers the secondary KB; wider retrieval infrastructure is not needed for the present scope — see `rag_decision.md` |
 | Automated publishing directly to LinkedIn | Out of scope for 2 days; output saved locally for manual posting instead |
 | Automatic post-success feedback/rating loop | Nice-to-have only, subjective to measure reliably in 2 days |
 
@@ -84,10 +84,12 @@
    2.2 Secondary KB (topics + sources)
 3. Ingest & context
    3.1 Markdown loader
-   3.2 News fetcher (fresh sources)
-   3.3 Chunk/select relevant news snippets
-   3.4 PDF / audio / YouTube ingestion into secondary KB
-   3.5 Favorites tracking (topics/articles) into primary KB
+   3.2 Secondary KB chunking
+   3.3 Embedding cache + retrieval ranking for secondary KB
+   3.4 News fetcher (fresh sources)
+   3.5 Chunk/select relevant news snippets
+   3.6 PDF / audio / YouTube ingestion into secondary KB
+   3.7 Favorites tracking (topics/articles) into primary KB
 4. Generate & differentiate
    4.1 LLM client + .env
    4.2 Prompt templates (LinkedIn + newsletter)
@@ -115,4 +117,4 @@
 
 ## 7. Bridge to rag_decision.md
 
-The AI consultant's Quality objective — content that sounds authentically like them, not generic — drives a context strategy built on a small, stable personal KB (M1, M2) rather than large-scale retrieval. None of the Musts force a search-over-large-corpus approach: the personal KB is a handful of files that fit entirely in a prompt (M1, M2), and freshness (M3) is solved by fetching a few live articles per run rather than searching a stored archive. Query diversity is also low — one or two posts per week from a predictable, small topic set, not many unpredictable questions against a large library. Decision in one line: **non-RAG, with a lightweight chunk/select step (M4) over freshly fetched news** — full defense in `rag_decision.md`. Revisit when the news/article archive grows large enough that finding the most relevant *past* article (not just today's) becomes the bottleneck, or when the personal KB itself grows past what comfortably fits in one prompt.
+The AI consultant's Quality objective — content that sounds authentically like them, not generic — drives a context strategy built on a small, stable personal KB (M1) plus a chunked-and-retrieved secondary KB (M2) rather than large-scale open-ended retrieval. The primary KB still fits directly in prompt context, while the secondary KB is now chunked and ranked by embeddings so the most relevant pieces are injected for generation. Freshness (M3) is still solved by fetching a few live articles per run rather than searching a stored archive. Query diversity is also low — one or two posts per week from a predictable, small topic set, not many unpredictable questions against a large library. Decision in one line: **primary direct context + secondary-side RAG, with a lightweight chunk/select step (M4) over freshly fetched news** — full defense in `rag_decision.md`. Revisit when the news/article archive grows large enough that finding the most relevant *past* article (not just today's) becomes the bottleneck, or when the personal KB itself grows past what comfortably fits in one prompt.
