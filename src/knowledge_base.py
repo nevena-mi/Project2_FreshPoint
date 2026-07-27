@@ -1,7 +1,7 @@
 """
 knowledge_base.py — Loads and structures the two markdown knowledge bases.
 
-Primary KB   : background.md, branding.md, tone_style.md, voice_examples.md
+Primary KB   : background.md, tone_style.md, voice_examples.md
                — your voice. Always injected directly into the prompt in
                full; no retrieval needed since it's small and curated.
 Secondary KB : topics.md + ingested/ (books, articles, PDFs you selected)
@@ -117,6 +117,34 @@ class KnowledgeBase:
             running_words += chunk.word_count
 
         return "\n\n".join(chunk.text for chunk in capped_chunks)
+
+    def get_background(self) -> str:
+        """Return the current contents of background.md, or empty string
+        if it doesn't exist yet (e.g. a brand-new user who hasn't filled
+        in the Add about you tab)."""
+        path = Path(self.primary_dir) / "background.md"
+        return path.read_text(encoding="utf-8") if path.exists() else ""
+
+    def save_background(self, text: str) -> None:
+        """Overwrite background.md with the given text — called from the
+        Add about you tab, so anyone can set their own background rather
+        than needing to hand-edit the file."""
+        path = Path(self.primary_dir) / "background.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+
+    def get_tone_style(self) -> str:
+        """Return the current contents of tone_style.md, or empty string
+        if it doesn't exist yet."""
+        path = Path(self.primary_dir) / "tone_style.md"
+        return path.read_text(encoding="utf-8") if path.exists() else ""
+
+    def save_tone_style(self, text: str) -> None:
+        """Overwrite tone_style.md with the given text — called from the
+        Add about you tab, same reasoning as save_background()."""
+        path = Path(self.primary_dir) / "tone_style.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
 
     def add_voice_example(self, post_text: str) -> None:
         """Append a post to knowledge_base/primary/voice_examples.md so
