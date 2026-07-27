@@ -53,7 +53,7 @@ STRUCTURAL GUIDANCE:
 
 Write one LinkedIn post (120-200 words) that:
 1. Opens with a clear point of view, not a summary.
-2. References at most one news item above, only if it's genuinely relevant.
+2. {news_requirement}
 3. Follows the hard rules and structural guidance above exactly.
 
 Respond with the post text only, no preamble.
@@ -74,7 +74,7 @@ generic newsletter tone.
 
 Write a newsletter (350-500 words) with:
 1. A one-line personal opener.
-2. 2-3 short sections, each built around one theme or news item above.
+2. {news_requirement}
 3. A closing personal takeaway or call to action.
 
 Respond with the newsletter text only, no preamble.
