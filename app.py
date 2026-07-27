@@ -17,13 +17,13 @@ from src.knowledge_base import KnowledgeBase
 from src.news_fetcher import fetch_daily_news
 from src.content_pipeline import generate_post
 from src.feedback import list_posts, mark_as_final, rate_post
-from src.document_processor import ingest_pdf, ingest_audio, ingest_youtube
+from src.document_processor import ingest_pdf, ingest_youtube, ingest_url_article
 
 st.set_page_config(page_title="FreshPoint", layout="centered")
 st.title("FreshPoint")
 
-tab_generate, tab_sources, tab_favorites, tab_review = st.tabs(
-    ["Generate", "Add Sources", "Favorites", "Review & Feedback"]
+tab_generate, tab_sources, tab_review = st.tabs(
+    ["Generate", "Add Sources", "Review & Feedback"]
 )
 
 with tab_generate:
@@ -42,53 +42,31 @@ with tab_generate:
 
         st.success("Generated.")
         st.text_area("Result", post.text, height=250)
-        if post.diagram_spec:
-            st.info(f"Suggested diagram: {post.diagram_spec}")
+        if post.diagram_spec and post.diagram_spec.get("svg_path"):
+            st.caption(f"Diagram type: {post.diagram_spec.get('diagram_type')}")
+            st.image(post.diagram_spec["svg_path"])
+        elif post.diagram_spec:
+            st.info("A diagram was recommended but could not be generated for this type.")
 
 with tab_sources:
-    st.write("Add a PDF, audio file, or YouTube video as extra secondary-KB context.")
+    st.write("Add a PDF, article URL, or YouTube video as extra secondary-KB context.")
 
     pdf_file = st.file_uploader("PDF", type=["pdf"])
     if pdf_file and st.button("Ingest PDF"):
-        tmp_path = Path("output") / pdf_file.name
-        tmp_path.parent.mkdir(exist_ok=True)
-        tmp_path.write_bytes(pdf_file.read())
-        saved_path = ingest_pdf(str(tmp_path))
+        saved_path = ingest_pdf(pdf_file.read(), pdf_file.name)
         st.success(f"Ingested — saved to {saved_path}")
 
-    audio_file = st.file_uploader("Audio", type=["mp3", "wav", "m4a"])
-    if audio_file and st.button("Ingest audio"):
-        tmp_path = Path("output") / audio_file.name
-        tmp_path.parent.mkdir(exist_ok=True)
-        tmp_path.write_bytes(audio_file.read())
-        saved_path = ingest_audio(str(tmp_path))
-        st.success(f"Transcribed and ingested — saved to {saved_path}")
+    article_url = st.text_input("Article URL")
+    if article_url and st.button("Ingest article"):
+        saved_path = ingest_url_article(article_url)
+        st.success(f"Article ingested — saved to {saved_path}")
 
     yt_url = st.text_input("YouTube URL")
     if yt_url and st.button("Ingest YouTube video"):
         saved_path = ingest_youtube(yt_url)
         st.success(f"Transcript ingested — saved to {saved_path}")
 
-    st.divider()
-    st.write("Refresh the chunked secondary KB export for operational use.")
-    if st.button("Refresh chunk export"):
-        kb = KnowledgeBase(primary_dir="knowledge_base/primary", secondary_dir="knowledge_base/secondary")
-        export_path = kb.export_secondary_chunks()
-        st.success(f"Chunk export written to {export_path}")
-
-with tab_favorites:
-    st.write("Add topics you like or articles you consider a good example of your voice.")
-    fav_entry = st.text_input("New favorite (topic or article title + link)")
-    if fav_entry and st.button("Save favorite"):
-        kb = KnowledgeBase(primary_dir="knowledge_base/primary", secondary_dir="knowledge_base/secondary")
-        kb.add_favorite(fav_entry)
-        st.success("Saved.")
-
-    fav_path = Path("knowledge_base/primary/favorites.md")
-    if fav_path.exists():
-        st.text_area("Current favorites.md", fav_path.read_text(encoding="utf-8"), height=200)
-
-
+with tab_review:
     posts = list_posts()
     if not posts:
         st.write("No posts generated yet — use the Generate tab first.")
