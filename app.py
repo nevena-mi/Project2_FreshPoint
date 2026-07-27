@@ -29,7 +29,7 @@ _kb_for_topics.load()
 TOPICS = _kb_for_topics.get_topics()
 
 tab_generate, tab_sources, tab_review = st.tabs(
-    ["Generate", "Add Sources", "Review & Feedback"]
+    ["Generate & Review", "Add Sources", "Feedback"]
 )
 
 with tab_generate:
@@ -40,30 +40,61 @@ with tab_generate:
         help="This drives which passages get pulled from your sources — be specific.",
     )
 
-    if st.button("Generate post"):
+    col_generate, col_generate_news = st.columns(2)
+    with col_generate:
+        generate_clicked = st.button("Generate post")
+    with col_generate_news:
+        generate_news_clicked = st.button("Generate post based on the news")
+
+    if generate_clicked:
+        with st.spinner("Loading knowledge base..."):
+            kb = KnowledgeBase(
+                primary_dir="knowledge_base/primary",
+                secondary_dir="knowledge_base/secondary",
+            )
+            kb.load()
+            # KB-only path — no news fetch here. That's what the "based on
+            # the news" button is for now, so this one doesn't spend NewsAPI
+            # quota on a post that isn't asking for news.
+            post = generate_post(mode=mode, kb=kb, news_items=[], angle=angle)
+            saved_path = kb.save_output(post, mode=mode)
+
+        # Stash in session_state — the button click below triggers a rerun,
+        # so a plain local variable wouldn't survive to that point. Written
+        # directly into "generate_draft_edit", the SAME key the text_area
+        # below uses, not a separate "draft_text" key — a keyed widget
+        # ignores any value= argument once it exists, it only ever reflects
+        # session_state[key], so this has to be the single source of truth.
+        st.session_state["draft_path"] = saved_path
+        st.session_state["generate_draft_edit"] = post.text
+        st.success("Generated — review below before marking it final.")
+
+    if generate_news_clicked:
         with st.spinner("Loading knowledge base and fetching news..."):
             kb = KnowledgeBase(
                 primary_dir="knowledge_base/primary",
                 secondary_dir="knowledge_base/secondary",
             )
             kb.load()
-            # No single topic to search anymore — angle now drives relevance
-            # in secondary_context(); news search stays broad across all topics.
             news_items = fetch_daily_news(topics=TOPICS, max_items=3)
-            post = generate_post(mode=mode, kb=kb, news_items=news_items, angle=angle)
-            saved_path = kb.save_output(post, mode=mode)
 
-        # Stash in session_state — the button click below triggers a rerun,
-        # so a plain local variable wouldn't survive to that point.
-        st.session_state["draft_path"] = saved_path
-        st.session_state["draft_text"] = post.text
-        st.success("Generated — review below before marking it final.")
+        if not news_items:
+            st.error(
+                "No news articles found right now — check NEWS_API_KEY and "
+                "your NewsAPI quota, or try again shortly. Can't generate a "
+                "news-based post with nothing to react to."
+            )
+        else:
+            post = generate_post(mode=mode, kb=kb, news_items=news_items, angle=angle, news_only=True)
+            saved_path = kb.save_output(post, mode=mode)
+            st.session_state["draft_path"] = saved_path
+            st.session_state["generate_draft_edit"] = post.text
+            st.success("Generated from the news — review below before marking it final.")
 
     if st.session_state.get("draft_path"):
         st.subheader("Review draft")
         edited_draft = st.text_area(
             "Post text (edit before marking as final)",
-            st.session_state["draft_text"],
             height=250,
             key="generate_draft_edit",
         )
@@ -76,7 +107,7 @@ with tab_generate:
             voice_kb.add_voice_example(edited_draft)
             st.success("Marked as final — added to your voice examples for future posts.")
             del st.session_state["draft_path"]
-            del st.session_state["draft_text"]
+            del st.session_state["generate_draft_edit"]
 
 with tab_sources:
     st.write("Add a PDF, article URL, or YouTube video as extra secondary-KB context.")

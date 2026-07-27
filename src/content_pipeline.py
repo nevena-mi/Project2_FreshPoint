@@ -17,17 +17,47 @@ class GeneratedPost:
     sources_used: list[str]
 
 
-def generate_post(mode: str, kb, news_items, angle: str | None = None) -> GeneratedPost:
+def generate_post(mode: str, kb, news_items, angle: str | None = None, news_only: bool = False) -> GeneratedPost:
+    """
+    news_only=True is the "Generate post based on the news" path: the post
+    must be built around a fetched news item, not just optionally touch one.
+    Raises if news_only is requested with no news_items — a news-based post
+    can't be generated from nothing, and silently falling back to KB-only
+    content would defeat the point of the button. The caller (app.py) is
+    expected to check for news before calling this, but this is the actual
+    guarantee.
+    """
+    if news_only and not news_items:
+        raise ValueError("No news items available — can't generate a news-based post.")
+
     template = LINKEDIN_TEMPLATE if mode == "linkedin" else NEWSLETTER_TEMPLATE
 
     news_context = _chunk_and_select(news_items) or (
         "No fresh news items this run — write from KB context alone."
     )
 
+    if news_only:
+        news_requirement = (
+            "This post MUST be built around one specific fresh news item above "
+            "— pick the single most relevant one and make it the anchor of the "
+            "whole post, not a passing reference."
+            if mode == "linkedin"
+            else "This newsletter MUST be built primarily around the fresh news "
+            "items above — treat KB context as supporting flavor, not the main content."
+        )
+    else:
+        news_requirement = (
+            "References at most one news item above, only if it's genuinely "
+            "relevant to the angle; it's fine to skip news entirely if none of it fits."
+            if mode == "linkedin"
+            else "2-3 short sections, each built around one theme or news item above."
+        )
+
     prompt = template.format(
         primary_context=kb.primary_context(),
         secondary_context=kb.secondary_context(angle=angle),
         news_context=news_context,
+        news_requirement=news_requirement,
     )
     print(prompt)
     text = complete(prompt)
