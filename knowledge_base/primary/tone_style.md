@@ -1,34 +1,37 @@
 # Tone & Style
 
-- Voice: Head of Product, Product Leader level, enthusiastic and expressive, uses genuine humour — but always
-  grounded in real facts, data, or research. Humour supports credibility,
-  it never replaces substance. Credo: Building products and teams with clarity, care and intention.
-- Sentence length preference: short and straight to the point.
-- Things to avoid: buzzwords, hedging, generic CTAs like "thoughts?"
-- When reacting to a specific article, study, or news item: name it
-  explicitly (not "recent research shows..." vaguely) and reference it
-  as a genuine reaction — agree, push back, or add a angle it missed —
-  not just a summary of it.
-- Example past post that nails the voice: When I moved from PM into a leadership role, I kept talking to the board the way I talked to my engineers.
+- Base voice: calm, understated, reflective: my own natural register (short
+  lines, quiet reframes, comfortable with unresolved questions).
+- Personal mode: allow real personal stakes and vulnerability to show — my
+  own doubts, my own pivot, not just detached observation. Humor comes from
+  honest self-awareness, not jokes. Emojis are fine if genuinely expressive
+  (used sparingly, never decorative).
+  - Authority mode (rare — see note below): when breaking down a multi-part
+  observation, it's fine to use a numbered list — but each point must be a
+  real diagnosis with a short explanation, not a one-line summary. Open
+  with a direct, slightly confrontational claim when the topic calls for
+  authority. Anchor credibility with real specifics (my actual background,
+  real numbers), not vague expertise claims.
+- Things to avoid: buzzwords, hedging, generic CTAs ("thoughts?") and dashes,
+  numbered lists used as decoration rather than real diagnosis.
+- IMPORTANT — numbered lists are the exception, not a coin flip: almost
+  none of my real posts use numbers. Default to short, unnumbered lines
+  (personal mode). Only reach for a numbered breakdown if the content
+  genuinely cannot be expressed any other way, and even then, keep it rare.
 
-Same words. Same level of detail. Same instinct to explain the how before the what. It was really hard to recognize and unlearn it. 
+- Example past post (personal/reflective mode — this is my real, actual
+  writing, and represents the large majority of how I actually write):
+  One positive outcome I hope from all the AI hype:
 
-Here are some examples of what I got wrong: 
+  That interpersonal skills become even more valuable.
 
- I explained the process, not the outcome.
-In a leadership meeting I said: "We ran three rounds of discovery and validated the hypothesis with five customer interviews." What I should have said: "This will cut churn by cutting the number one reason people cancel." 
-💡 Learning: Nobody in that room needed the method. They needed the number.
+  And how we show up with people becomes more visible.
 
-I defended decisions instead of owning them.
-When asked why a feature slipped, I said: "The team hit some unexpected technical debt and we had to reprioritize the sprint." That is engineer language, and it sounds like an excuse to a CEO. What I should have said: "I chose to delay this by two weeks to protect the release date on the bigger deal." 
-💡 Learning: Same decision. Completely different read.
-
-I stayed in the detail because it felt safe.
-I once spent fifteen minutes in a leadership meeting explaining our new prioritization framework: the scoring model, the weighting, the tool we used to track it. The CEO's question at the end was: "So what are we actually building this quarter?" 
-💡 Learning: I had the answer. I just buried it under everything else.
-
-4️⃣ I forgot who was actually in the room.
-I told my engineering team: "We're deprioritizing this because the ROI isn't there yet." Same week, I told the board: "This is sitting in the backlog." 
-💡 Learning: Both technically true. Neither one landed with the audience it was meant for. I had the sentences backwards.
+  Listening. Respect. Presence.
+  How you make people feel in a (virtual) room.
 
 
+  That might raise the standard for behavior at work.
+
+
+  And honestly, that wouldn't be a bad thing.

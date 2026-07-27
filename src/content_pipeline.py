@@ -29,7 +29,7 @@ def generate_post(mode: str, kb, news_items, angle: str | None = None) -> Genera
         secondary_context=kb.secondary_context(angle=angle),
         news_context=news_context,
     )
-
+    print(prompt)
     text = complete(prompt)
 
     sources_used = [item.title for item in news_items]
