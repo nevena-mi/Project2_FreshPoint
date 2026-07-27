@@ -34,7 +34,6 @@ tab_generate, tab_sources, tab_review = st.tabs(
 
 with tab_generate:
     mode = st.radio("Content type", ["linkedin", "newsletter"], horizontal=True)
-    topic = st.selectbox("Topic", TOPICS)
     angle = st.text_input(
         "What's this post actually about?",
         placeholder="e.g. why hiring for technical skill alone misses the point",
@@ -48,8 +47,10 @@ with tab_generate:
                 secondary_dir="knowledge_base/secondary",
             )
             kb.load()
-            news_items = fetch_daily_news(topics=[topic], max_items=3)
-            post = generate_post(mode=mode, kb=kb, news_items=news_items, topic=topic, angle=angle)
+            # No single topic to search anymore — angle now drives relevance
+            # in secondary_context(); news search stays broad across all topics.
+            news_items = fetch_daily_news(topics=TOPICS, max_items=3)
+            post = generate_post(mode=mode, kb=kb, news_items=news_items, angle=angle)
             kb.save_output(post, mode=mode)
 
         st.success("Generated.")

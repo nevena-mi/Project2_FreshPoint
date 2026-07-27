@@ -1,0 +1,18 @@
+{
+  "mode": "linkedin",
+  "timestamp": "20260727_113433",
+  "text": "The future of AI product management is not just about mastering the tech\u2014it's about mastering the narrative. We\u2019re in a landscape where understanding data flow is crucial, but if you can't translate that to stakeholders, you're missing the mark. \n\nA recent article highlighted how to discuss AI in interviews. Guess what? It\u2019s not about your coding skills; it\u2019s your ability to tell a compelling story about what AI can achieve. When I shifted my focus to AI, I realized that the real value lies in bridging gaps, not just between tech and business, but between understanding and action.\n\nThe best PMs are those who can simplify complex ideas and rally teams around a shared vision. So, as you navigate this evolving space, ask yourself: are you just learning the tech, or are you learning how to communicate its value? \n\nYour voice is your greatest tool\u2014use it wisely.",
+  "diagram_spec": {
+    "needs_diagram": true,
+    "diagram_type": "comparison",
+    "diagram_prompt": "A comparison diagram illustrating the difference between mastering technology and mastering narrative in AI product management."
+  },
+  "sources_used": [
+    "How to best talk about AI in job interviews \u2014 even if you're skeptical of it",
+    "Morgan Stanley resets Microsoft stock forecast ahead of earnings - thestreet.com",
+    "topos-mcp 0.4.2"
+  ],
+  "status": "draft",
+  "final_text": null,
+  "rating": null
+}

@@ -89,44 +89,33 @@ class KnowledgeBase:
         """Concatenate all primary docs for prompt injection."""
         return "\n\n".join(f"## {name}\n{text}" for name, text in self.primary_docs.items())
 
-    def secondary_context(self, topic: str | None = None, angle: str | None = None, top_k: int = 6) -> str:
-        """Return secondary KB text for prompt injection: topic-filtered,
-        then ranked by relevance to the post's specific angle.
+    def secondary_context(self, angle: str | None = None, top_k: int = 6) -> str:
+        """Return secondary KB text for prompt injection, ranked by
+        relevance to the post's specific angle.
 
-        Chunks tagged with a topic (from ingested/ sources, e.g.
-        'leadership__article.md') are only considered when they match the
-        given topic. Untagged chunks (hand-written secondary KB files like
-        topics.md) are always included, since those are your small,
-        curated foundational context.
+        Topic tags on ingested files (e.g. 'leadership__article.md') are
+        kept purely as organizational metadata now — they no longer gate
+        what's included. Every chunk (from every source, any topic) is a
+        candidate; the angle's embedding similarity decides what's
+        actually relevant. This is what keeps output focused as your
+        source library grows, regardless of which topic bucket a given
+        source happens to be filed under.
 
-        If an angle is given, the topic-filtered chunks are ranked by
-        embedding similarity to that angle, and only the top_k most
-        relevant are returned — this is what keeps output focused as your
-        source library grows, instead of diluting with everything that
-        merely matches the topic. If no angle is given, falls back to a
-        simple word-count cap in document order (a safety net, not the
-        main mechanism).
+        If no angle is given, falls back to a simple word-count cap in
+        document order (a safety net, not the main mechanism) — this
+        should be rare in normal use now that angle drives generation.
         """
         if not self.secondary_chunks:
             # Fallback for callers that have not loaded the KB yet.
             return "\n\n".join(f"## {name}\n{text}" for name, text in self.secondary_docs.items())
 
-        def include(chunk) -> bool:
-            if chunk.topic is None:
-                return True
-            if topic is None:
-                return False
-            return chunk.topic == topic.strip().lower()
-
-        selected = [chunk for chunk in self.secondary_chunks if include(chunk)]
-
         if angle and angle.strip():
-            top_chunks = retrieve_top_chunks(selected, angle, top_k=top_k)
+            top_chunks = retrieve_top_chunks(self.secondary_chunks, angle, top_k=top_k)
             return "\n\n".join(chunk.text for chunk in top_chunks)
 
         # No angle given — fall back to word-count-capped, document-order chunks.
         ordered_chunks = sorted(
-            selected,
+            self.secondary_chunks,
             key=lambda chunk: (chunk.source_path, chunk.section_index, chunk.chunk_index),
         )
         capped_chunks = []

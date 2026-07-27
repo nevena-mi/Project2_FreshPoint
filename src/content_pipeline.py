@@ -23,7 +23,7 @@ class GeneratedPost:
     sources_used: list[str]
 
 
-def generate_post(mode: str, kb, news_items, topic: str | None = None, angle: str | None = None) -> GeneratedPost:
+def generate_post(mode: str, kb, news_items, angle: str | None = None) -> GeneratedPost:
     template = LINKEDIN_TEMPLATE if mode == "linkedin" else NEWSLETTER_TEMPLATE
 
     news_context = _chunk_and_select(news_items) or (
@@ -32,7 +32,7 @@ def generate_post(mode: str, kb, news_items, topic: str | None = None, angle: st
 
     prompt = template.format(
         primary_context=kb.primary_context(),
-        secondary_context=kb.secondary_context(topic=topic, angle=angle),
+        secondary_context=kb.secondary_context(angle=angle),
         news_context=news_context,
     )
 
