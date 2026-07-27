@@ -163,7 +163,6 @@ class KnowledgeBase:
             "mode": mode,
             "timestamp": timestamp,
             "text": post.text,
-            "diagram_spec": post.diagram_spec,
             "sources_used": post.sources_used,
             "status": "draft",
             "final_text": None,

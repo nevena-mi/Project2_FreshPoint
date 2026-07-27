@@ -7,6 +7,14 @@ Two templates as required by the brief (M4: reusable prompt templates >=2):
 
 Both combine the primary KB (brand voice) with the secondary KB / news
 (industry context) — the "hybrid" style from the brief.
+
+LINKEDIN_TEMPLATE explicitly separates "hard rules" (things to never do,
+pulled directly from tone_style.md) from "structural mimicry" (telling the
+model to structure the post like your real example posts, not just
+vaguely "match the tone"). Soft instructions like "match the tone/style"
+are easy for the model to nod at without actually following — naming the
+exact phrases to avoid and pointing at a concrete example to structurally
+mirror gets much more reliable results.
 """
 
 LINKEDIN_TEMPLATE = """\
@@ -14,20 +22,39 @@ You are writing a LinkedIn post in the voice described below. Do not sound \
 like generic AI-generated content — be specific, opinionated, and grounded \
 in the person's actual background.
 
---- BRAND / VOICE CONTEXT ---
+--- VOICE, BACKGROUND, AND REAL EXAMPLE POSTS (mirror this structure) ---
 {primary_context}
 
---- INDUSTRY CONTEXT / TOPICS ---
+--- RELEVANT SOURCE MATERIAL FOR THIS POST ---
 {secondary_context}
 
 --- FRESH NEWS TO OPTIONALLY REACT TO ---
 {news_context}
 
+HARD RULES — do not violate these, they come directly from this person's
+own stated preferences:
+- Do not end with a generic call-to-reflection question (e.g. "What do
+  you think?", "How are you ensuring...?", "Reflect on this: ..."). If you
+  close with a question at all, it must be sharp and specific, not a
+  broad invitation for comments.
+- Do not use generic LinkedIn-AI phrasing like "game-changer", "wild
+  ride", "in today's landscape", or similar buzzwords, unless a real
+  example post above actually uses that kind of language.
+- Do not hedge ("some might say", "it could be argued") — take a clear
+  position.
+
+STRUCTURAL GUIDANCE:
+- If a real example post appears in the voice/background context above,
+  mirror its structure and rhythm (e.g. concrete anecdote, numbered
+  contrasts, a short punchy insight after each point) rather than writing
+  a generic think-piece shape.
+- Ground the post in a specific moment, decision, or detail — not an
+  abstract industry observation.
+
 Write one LinkedIn post (120-200 words) that:
 1. Opens with a clear point of view, not a summary.
 2. References at most one news item above, only if it's genuinely relevant.
-3. Ends with a short, non-generic call to reflection (not "What do you think?").
-4. Matches the tone/style described in the brand context.
+3. Follows the hard rules and structural guidance above exactly.
 
 Respond with the post text only, no preamble.
 """
@@ -51,13 +78,4 @@ Write a newsletter (350-500 words) with:
 3. A closing personal takeaway or call to action.
 
 Respond with the newsletter text only, no preamble.
-"""
-
-DIAGRAM_DECISION_TEMPLATE = """\
-Given this post text, decide if a simple diagram would strengthen it:
-
-{post_text}
-
-Reply with JSON only: {{"needs_diagram": true/false, "diagram_type": \
-"flow|comparison|timeline|none", "diagram_prompt": "short description if needed"}}
 """

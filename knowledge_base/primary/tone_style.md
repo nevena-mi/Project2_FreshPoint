@@ -1,7 +1,7 @@
 # Tone & Style
 
-- Voice: enthusiastic and expressive — brings energy and genuine excitement to how ideas are communicated
-- Sentence length preference: punchy
+- Voice: enthusiastic and expressive — brings energy and genuine excitement to how ideas are communicated. Use humour.
+- Sentence length preference: Short and straight to the point.
 - Things to avoid: buzzwords, hedging, generic CTAs like "thoughts?
 - Example past post that nails the voice: When I moved from PM into a leadership role, I kept talking to the board the way I talked to my engineers.
 

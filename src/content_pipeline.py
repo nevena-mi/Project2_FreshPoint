@@ -1,25 +1,19 @@
 """
 content_pipeline.py — Orchestrates brief -> publish for one content mode.
 
-Keeps the "expensive/complex" diagram step optional and separate, so the
-text-only MVP always works even if diagram generation is skipped or fails.
+Diagram generation has been removed for now (unused code, cut to keep the
+pipeline focused) — GeneratedPost no longer carries a diagram_spec field.
 """
 
-import json
 from dataclasses import dataclass
 
 from src.llm_integration import complete
-from src.prompt_templates import (
-    LINKEDIN_TEMPLATE,
-    NEWSLETTER_TEMPLATE,
-    DIAGRAM_DECISION_TEMPLATE,
-)
+from src.prompt_templates import LINKEDIN_TEMPLATE, NEWSLETTER_TEMPLATE
 
 
 @dataclass
 class GeneratedPost:
     text: str
-    diagram_spec: dict | None
     sources_used: list[str]
 
 
@@ -38,13 +32,8 @@ def generate_post(mode: str, kb, news_items, angle: str | None = None) -> Genera
 
     text = complete(prompt)
 
-    # Optional diagram step — only for LinkedIn, only if it's worth the cost.
-    diagram_spec = None
-    if mode == "linkedin":
-        diagram_spec = _maybe_plan_diagram(text)
-
     sources_used = [item.title for item in news_items]
-    return GeneratedPost(text=text, diagram_spec=diagram_spec, sources_used=sources_used)
+    return GeneratedPost(text=text, sources_used=sources_used)
 
 
 MAX_SNIPPET_CHARS = 240
@@ -67,21 +56,3 @@ def _chunk_and_select(news_items) -> str:
             snippet = snippet[:MAX_SNIPPET_CHARS].rsplit(" ", 1)[0] + "..."
         lines.append(f"- {item.title} ({item.source}): {snippet}")
     return "\n".join(lines)
-
-
-def _maybe_plan_diagram(post_text: str) -> dict | None:
-    """Ask the LLM whether this post warrants a diagram, and what kind.
-
-    Cheap decision step (short prompt, small output) before spending on
-    actual diagram/image generation — keeps the visual feature from
-    running (and costing) on every single post.
-    """
-    raw = complete(DIAGRAM_DECISION_TEMPLATE.format(post_text=post_text), temperature=0.0)
-    try:
-        decision = json.loads(raw)
-    except json.JSONDecodeError:
-        return None
-
-    if not decision.get("needs_diagram"):
-        return None
-    return decision

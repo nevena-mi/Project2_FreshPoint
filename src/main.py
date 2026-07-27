@@ -37,8 +37,6 @@ def run(mode: str, angle: str | None = None) -> None:
 
     print("\n=== GENERATED CONTENT ===\n")
     print(post.text)
-    if post.diagram_spec:
-        print("\n[Diagram spec attached — see post.diagram_spec]")
 
     # 5. Iterate stage: save output for human review / next-round refinement
     kb.save_output(post, mode=mode)

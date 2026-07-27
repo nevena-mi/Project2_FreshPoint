@@ -55,11 +55,6 @@ with tab_generate:
 
         st.success("Generated.")
         st.text_area("Result", post.text, height=250)
-        if post.diagram_spec and post.diagram_spec.get("svg_path"):
-            st.caption(f"Diagram type: {post.diagram_spec.get('diagram_type')}")
-            st.image(post.diagram_spec["svg_path"])
-        elif post.diagram_spec:
-            st.info("A diagram was recommended but could not be generated for this type.")
 
 with tab_sources:
     st.write("Add a PDF, article URL, or YouTube video as extra secondary-KB context.")
