@@ -1,0 +1,18 @@
+{
+  "mode": "linkedin",
+  "timestamp": "20260727_093726",
+  "text": "The transition to AI isn't just about implementing new technology; it's about reshaping how we think about human potential in the workplace. I\u2019ve spent over a decade in product management, and now as I dive deeper into AI, I\u2019m reminded that the most successful implementations are those that prioritize people, not just processes.\n\nTake a look at Ethan, the lightweight personal AI agent. While it's impressive, I can't help but wonder: does it truly enhance human capabilities, or does it risk diluting our decision-making? As we develop these systems, we must ensure they amplify our strengths rather than replace our judgment.\n\nIn my journey, I've seen firsthand how a people-first approach can drive engagement and innovation. It\u2019s time we reflect on what we want AI to achieve for us\u2014not just in terms of efficiency but in fostering creativity and connection.\n\nHow can we ensure that our AI systems remain tools for empowerment, not just automation?",
+  "diagram_spec": {
+    "needs_diagram": true,
+    "diagram_type": "comparison",
+    "diagram_prompt": "Compare the benefits of a people-first approach to AI implementation versus a process-first approach."
+  },
+  "sources_used": [
+    "ethan-agent 0.5.50",
+    "[SnS, AC] $6.26* | 120-Count Mighty Paw Waggables Allergy Immune + Itch Support Vitamin Dog Chews at Amazon",
+    "Danantara builds integrated human resources management system for SOEs"
+  ],
+  "status": "draft",
+  "final_text": null,
+  "rating": null
+}

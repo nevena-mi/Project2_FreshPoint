@@ -15,12 +15,22 @@ OUTPUT_DIR = Path("output")
 VALID_RATINGS = {"green", "orange", "red"}
 
 
-def list_posts() -> list[dict]:
-    """Return every saved post record, most recent first."""
+def list_posts(status: str | None = None) -> list[dict]:
+    """Return saved post records, most recent first.
+
+    status=None (default) returns everything, drafts included — unchanged
+    behavior for any existing caller.
+    status="final" returns only posts that have been marked as final via
+    mark_as_final(). Use this in the Review & Feedback tab so drafts never
+    show up there; a post should only be rateable once it's actually been
+    posted, not while it's still a draft.
+    """
     posts = []
     for path in sorted(OUTPUT_DIR.glob("*.json"), reverse=True):
         record = json.loads(path.read_text(encoding="utf-8"))
         record["_path"] = str(path)
+        if status is not None and record.get("status") != status:
+            continue
         posts.append(record)
     return posts
 

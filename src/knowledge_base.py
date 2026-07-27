@@ -154,8 +154,13 @@ class KnowledgeBase:
         export_chunks_jsonl(self.secondary_chunks, Path(out_path))
         return str(out_path)
 
-    def save_output(self, post, mode: str) -> None:
-        """Persist generated content for the iterate stage / human review."""
+    def save_output(self, post, mode: str) -> str:
+        """Persist generated content for the iterate stage / human review.
+
+        Returns the path it wrote to, so the caller (e.g. app.py's Generate
+        tab) can reference this exact draft later, e.g. to mark it final,
+        without needing to re-scan output/ or ask the user to find it again.
+        """
         out_dir = Path("output")
         out_dir.mkdir(exist_ok=True)
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -170,3 +175,4 @@ class KnowledgeBase:
         }
         out_path = out_dir / f"{mode}_{timestamp}.json"
         out_path.write_text(json.dumps(record, indent=2), encoding="utf-8")
+        return str(out_path)

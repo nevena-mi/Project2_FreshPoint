@@ -23,23 +23,29 @@ class NewsItem:
     source: str
 
 
-def fetch_daily_news(topics: list[str], max_items: int = 3) -> list[NewsItem]:
-    """Fetch a small number of recent articles across the given topics.
+def fetch_news_for_topic(topic: str, max_items: int = 10) -> list[NewsItem]:
+    """Fetch recent, relevant articles for a single topic.
 
-    Kept deliberately simple: one query per pipeline run, top N results.
-    Falls back to an empty list (post generation still works without news)
-    if the API key is missing or the request fails — see agents.md
-    Definition of Done re: error handling.
+    Fixes the two bugs found in the old fetch_daily_news:
+      1. Single-topic query instead of an OR-joined query across all topics,
+         so "AI" no longer pulls in an article that just happens to mention
+         "leadership" in passing.
+      2. sortBy=relevancy instead of publishedAt, so results are ranked by
+         match quality, not just recency.
+
+    Returns up to max_items candidates for a human to choose from in the UI
+    (see app.py tab_sources), rather than auto-selecting one. Falls back to
+    an empty list if the API key is missing or the request fails, per
+    agents.md Definition of Done re: error handling.
     """
     api_key = os.getenv("NEWS_API_KEY")
-    if not api_key:
+    if not api_key or not topic:
         return []
 
-    query = " OR ".join(topics[:4])
     params = {
-        "q": query,
+        "q": topic,
         "language": "en",
-        "sortBy": "publishedAt",
+        "sortBy": "relevancy",
         "pageSize": max_items,
         "apiKey": api_key,
     }
@@ -60,3 +66,25 @@ def fetch_daily_news(topics: list[str], max_items: int = 3) -> list[NewsItem]:
         )
         for a in articles
     ]
+
+
+def fetch_daily_news(topics: list[str], max_items: int = 3) -> list[NewsItem]:
+    """Back-compat wrapper: fetch across multiple topics via separate
+    per-topic queries (not one OR-joined query), then merge and cap.
+
+    Prefer calling fetch_news_for_topic(topic) directly once a topic has
+    already been chosen in the UI. This wrapper exists only for any call
+    site that still expects a multi-topic list.
+    """
+    results: list[NewsItem] = []
+    seen_urls: set[str] = set()
+    per_topic_cap = max(1, max_items // max(1, len(topics[:4])))
+
+    for topic in topics[:4]:
+        for item in fetch_news_for_topic(topic, max_items=per_topic_cap):
+            if item.url and item.url in seen_urls:
+                continue
+            seen_urls.add(item.url)
+            results.append(item)
+
+    return results[:max_items]

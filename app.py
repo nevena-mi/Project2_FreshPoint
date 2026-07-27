@@ -51,10 +51,32 @@ with tab_generate:
             # in secondary_context(); news search stays broad across all topics.
             news_items = fetch_daily_news(topics=TOPICS, max_items=3)
             post = generate_post(mode=mode, kb=kb, news_items=news_items, angle=angle)
-            kb.save_output(post, mode=mode)
+            saved_path = kb.save_output(post, mode=mode)
 
-        st.success("Generated.")
-        st.text_area("Result", post.text, height=250)
+        # Stash in session_state — the button click below triggers a rerun,
+        # so a plain local variable wouldn't survive to that point.
+        st.session_state["draft_path"] = saved_path
+        st.session_state["draft_text"] = post.text
+        st.success("Generated — review below before marking it final.")
+
+    if st.session_state.get("draft_path"):
+        st.subheader("Review draft")
+        edited_draft = st.text_area(
+            "Post text (edit before marking as final)",
+            st.session_state["draft_text"],
+            height=250,
+            key="generate_draft_edit",
+        )
+        if st.button("Mark as final / published", key="generate_mark_final"):
+            mark_as_final(st.session_state["draft_path"], edited_draft)
+            voice_kb = KnowledgeBase(
+                primary_dir="knowledge_base/primary",
+                secondary_dir="knowledge_base/secondary",
+            )
+            voice_kb.add_voice_example(edited_draft)
+            st.success("Marked as final — added to your voice examples for future posts.")
+            del st.session_state["draft_path"]
+            del st.session_state["draft_text"]
 
 with tab_sources:
     st.write("Add a PDF, article URL, or YouTube video as extra secondary-KB context.")
@@ -76,30 +98,30 @@ with tab_sources:
         st.success(f"Transcript ingested — saved to {saved_path}")
 
 with tab_review:
-    posts = list_posts()
+    # Only posts already marked final show up here — a post has to be
+    # confirmed as posted (in the Generate tab) before it's rateable.
+    posts = list_posts(status="final")
     if not posts:
-        st.write("No posts generated yet — use the Generate tab first.")
+        st.write(
+            "No posts marked as final yet — generate a post and confirm it "
+            "as final on the Generate tab first."
+        )
     else:
-        labels = [f"{p['mode']} — {p['timestamp']} — {p.get('status', 'draft')}" for p in posts]
+        labels = [f"{p['mode']} — {p['timestamp']}" for p in posts]
         selected = st.selectbox("Pick a post", range(len(posts)), format_func=lambda i: labels[i])
         post = posts[selected]
 
         edited_text = st.text_area(
-            "Post text (edit before marking as final if needed)",
+            "Post text (final, published version)",
             post.get("final_text") or post["text"],
             height=250,
         )
 
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("Mark as final / published"):
+            if st.button("Update final text"):
                 mark_as_final(post["_path"], edited_text)
-                voice_kb = KnowledgeBase(
-                    primary_dir="knowledge_base/primary",
-                    secondary_dir="knowledge_base/secondary",
-                )
-                voice_kb.add_voice_example(edited_text)
-                st.success("Marked as final — added to your voice examples for future posts.")
+                st.success("Final text updated.")
 
         with col2:
             rating = st.radio("Performance rating", ["green", "orange", "red"], horizontal=True, index=None)
