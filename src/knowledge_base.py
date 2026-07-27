@@ -129,8 +129,14 @@ class KnowledgeBase:
         return "\n\n".join(chunk.text for chunk in capped_chunks)
 
     def add_voice_example(self, post_text: str) -> None:
-        """Append a posted/finalized post to knowledge_base/primary/voice_examples.md
-        so future generations draw on your real, actually-published writing.
+        """Append a post to knowledge_base/primary/voice_examples.md so
+        future generations draw on real writing that's confirmed to work.
+
+        Called only for posts rated "good" in the Feedback tab (see app.py),
+        not for every finalized/published post — publishing something isn't
+        the same as it being good, and dumping every published post in here
+        regardless of quality defeats the point of using this as a few-shot
+        grounding signal.
 
         Keeps only the most recent MAX_VOICE_EXAMPLES posts — old ones are
         trimmed off the top so this file (and the prompt) stays small.

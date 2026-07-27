@@ -12,11 +12,12 @@ Two tabs:
 
 import streamlit as st
 from pathlib import Path
+from datetime import datetime
 
 from src.knowledge_base import KnowledgeBase
 from src.news_fetcher import fetch_daily_news
 from src.content_pipeline import generate_post
-from src.feedback import list_posts, mark_as_final, rate_post
+from src.feedback import list_posts, mark_as_final, rate_post, mark_voice_example_added
 from src.document_processor import ingest_pdf, ingest_youtube, ingest_url_article
 
 st.set_page_config(page_title="FreshPoint", layout="centered")
@@ -27,6 +28,23 @@ st.title("FreshPoint")
 _kb_for_topics = KnowledgeBase(primary_dir="knowledge_base/primary", secondary_dir="knowledge_base/secondary")
 _kb_for_topics.load()
 TOPICS = _kb_for_topics.get_topics()
+
+
+def _post_label(post: dict) -> str:
+    """Human-readable 'date — short title' label so posts are actually
+    findable in a dropdown, instead of raw mode + timestamp."""
+    raw_ts = post.get("timestamp", "")
+    try:
+        date_str = datetime.strptime(raw_ts, "%Y%m%d_%H%M%S").strftime("%Y-%m-%d %H:%M")
+    except ValueError:
+        date_str = raw_ts or "unknown date"
+
+    text = (post.get("final_text") or post.get("text") or "").strip()
+    first_line = text.splitlines()[0] if text else ""
+    first_line = first_line.replace("**", "").replace("*", "").strip()
+    title = first_line[:60] + "…" if len(first_line) > 60 else first_line
+
+    return f"{date_str} — {title}" if title else f"{date_str} — ({post.get('mode', 'post')})"
 
 tab_generate, tab_sources, tab_review = st.tabs(
     ["Generate & Review", "Add Sources", "Feedback"]
@@ -100,12 +118,11 @@ with tab_generate:
         )
         if st.button("Mark as final / published", key="generate_mark_final"):
             mark_as_final(st.session_state["draft_path"], edited_draft)
-            voice_kb = KnowledgeBase(
-                primary_dir="knowledge_base/primary",
-                secondary_dir="knowledge_base/secondary",
+            st.success(
+                "Marked as final — rate it Good/Medium/Poor on the Feedback "
+                "tab once you know how it did; only Good posts get added to "
+                "your voice examples."
             )
-            voice_kb.add_voice_example(edited_draft)
-            st.success("Marked as final — added to your voice examples for future posts.")
             del st.session_state["draft_path"]
             del st.session_state["generate_draft_edit"]
 
@@ -130,15 +147,15 @@ with tab_sources:
 
 with tab_review:
     # Only posts already marked final show up here — a post has to be
-    # confirmed as posted (in the Generate tab) before it's rateable.
+    # confirmed as posted (in the Generate & Review tab) before it's rateable.
     posts = list_posts(status="final")
     if not posts:
         st.write(
             "No posts marked as final yet — generate a post and confirm it "
-            "as final on the Generate tab first."
+            "as final on the Generate & Review tab first."
         )
     else:
-        labels = [f"{p['mode']} — {p['timestamp']}" for p in posts]
+        labels = [_post_label(p) for p in posts]
         selected = st.selectbox("Pick a post", range(len(posts)), format_func=lambda i: labels[i])
         post = posts[selected]
 
@@ -148,6 +165,14 @@ with tab_review:
             height=250,
         )
 
+        status_bits = []
+        if post.get("rating"):
+            status_bits.append(f"Current rating: {post['rating'].capitalize()}")
+        if post.get("added_to_voice_examples"):
+            status_bits.append("already added to voice examples")
+        if status_bits:
+            st.caption(" · ".join(status_bits))
+
         col1, col2 = st.columns(2)
         with col1:
             if st.button("Update final text"):
@@ -155,10 +180,25 @@ with tab_review:
                 st.success("Final text updated.")
 
         with col2:
-            rating = st.radio("Performance rating", ["green", "orange", "red"], horizontal=True, index=None)
-            if rating and st.button("Save rating"):
+            rating_label = st.radio(
+                "Performance rating", ["Good", "Medium", "Poor"], horizontal=True, index=None
+            )
+            if rating_label and st.button("Save rating"):
+                rating = rating_label.lower()
                 rate_post(post["_path"], rating)
-                st.success(f"Rated {rating}.")
+
+                if rating == "good" and not post.get("added_to_voice_examples"):
+                    voice_kb = KnowledgeBase(
+                        primary_dir="knowledge_base/primary",
+                        secondary_dir="knowledge_base/secondary",
+                    )
+                    voice_kb.add_voice_example(edited_text)
+                    mark_voice_example_added(post["_path"])
+                    st.success("Rated Good — added to your voice examples for future posts.")
+                elif rating == "good":
+                    st.success("Rated Good — already in your voice examples from an earlier rating.")
+                else:
+                    st.success(f"Rated {rating_label}.")
 
         if post.get("sources_used"):
             st.caption("News sources used: " + ", ".join(post["sources_used"]))
