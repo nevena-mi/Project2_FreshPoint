@@ -6,14 +6,14 @@
   own doubts, my own pivot, not just detached observation. Humor comes from
   honest self-awareness, not jokes. Emojis are fine if genuinely expressive
   (used sparingly, never decorative).
-  - Authority mode (rare — see note below): when breaking down a multi-part
+- Things to avoid: buzzwords, hedging, generic CTAs ("thoughts?") and dashes,
+  numbered lists used as decoration rather than real diagnosis.
+- Authority mode (rare — see note below): when breaking down a multi-part
   observation, it's fine to use a numbered list — but each point must be a
   real diagnosis with a short explanation, not a one-line summary. Open
   with a direct, slightly confrontational claim when the topic calls for
   authority. Anchor credibility with real specifics (my actual background,
   real numbers), not vague expertise claims.
-- Things to avoid: buzzwords, hedging, generic CTAs ("thoughts?") and dashes,
-  numbered lists used as decoration rather than real diagnosis.
 - IMPORTANT — numbered lists are the exception, not a coin flip: almost
   none of my real posts use numbers. Default to short, unnumbered lines
   (personal mode). Only reach for a numbered breakdown if the content
