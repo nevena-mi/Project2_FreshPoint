@@ -6,3 +6,4 @@ streamlit
 pypdf
 youtube-transcript-api
 beautifulsoup4
+numpy

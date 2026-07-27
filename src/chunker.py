@@ -30,6 +30,15 @@ HEADING_RE = re.compile(r"^(#{1,6})\s+(.*\S)\s*$")
 PAGE_NUMBER_RE = re.compile(r"^\s*\d+\s*$")
 WHITESPACE_RE = re.compile(r"[ \t]+")
 SENTENCE_RE = re.compile(r"(?<=[.!?])\s+(?=[A-Z0-9(])")
+TOPIC_PREFIX_RE = re.compile(r"^([a-z0-9\-]+)__")
+
+
+def _topic_from_filename(stem: str) -> str | None:
+    """Ingested files are saved as '{topic_slug}__{name}.md' by
+    document_processor.py. Files without that prefix (e.g. topics.md,
+    hand-written secondary KB files) have no topic tag."""
+    match = TOPIC_PREFIX_RE.match(stem)
+    return match.group(1) if match else None
 
 
 @dataclass(frozen=True)
@@ -44,6 +53,7 @@ class Chunk:
     section_index: int
     word_count: int
     char_count: int
+    topic: str | None = None
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -174,6 +184,7 @@ def chunk_markdown_document(path: Path, target_words: int = TARGET_CHUNK_WORDS, 
     text = normalize_text(load_markdown(path))
     sections = split_into_sections(text)
     doc_id = path.stem
+    topic = _topic_from_filename(doc_id)
     chunks: list[Chunk] = []
     chunk_index = 0
 
@@ -185,6 +196,7 @@ def chunk_markdown_document(path: Path, target_words: int = TARGET_CHUNK_WORDS, 
             chunk_index_start=chunk_index,
             target_words=target_words,
             max_words=max_words,
+            topic=topic,
         )
         chunks.extend(section_chunks)
         chunk_index += len(section_chunks)
@@ -219,6 +231,7 @@ def _chunk_section(
     chunk_index_start: int,
     target_words: int,
     max_words: int,
+    topic: str | None = None,
 ) -> list[Chunk]:
     blocks = split_paragraphs(section.body)
     if not blocks:
@@ -251,6 +264,7 @@ def _chunk_section(
                 section_index=section.section_index,
                 word_count=word_count(text),
                 char_count=len(text),
+                topic=topic,
             )
         )
     return chunks

@@ -3,8 +3,10 @@ document_processor.py — Ingest non-markdown sources (PDF, web article URLs,
 and YouTube) into the secondary knowledge base as plain text/markdown.
 
 Each ingested source is saved as a new .md file under
-knowledge_base/secondary/ingested/, so it flows into the existing
-KnowledgeBase.secondary_context() without any changes needed there.
+knowledge_base/secondary/ingested/, tagged with the topic it belongs to
+(filename prefix, e.g. "leadership__some-article.md") so the chunker and
+knowledge_base can filter content by topic at generation time instead of
+stuffing every ingested source into every prompt.
 
 PDF uses pypdf. YouTube uses youtube-transcript-api (works only for
 videos that already have captions/transcripts available). Article URLs
@@ -27,10 +29,10 @@ from youtube_transcript_api import YouTubeTranscriptApi
 INGESTED_DIR = Path("knowledge_base/secondary/ingested")
 
 
-def ingest_pdf(file_bytes: bytes, original_name: str) -> str:
-    """Extract text from PDF bytes and save it as a secondary KB markdown file.
-    Writes to a temp file only for the duration of extraction, then deletes it.
-    Returns the path to the saved .md file."""
+def ingest_pdf(file_bytes: bytes, original_name: str, topic: str) -> str:
+    """Extract text from PDF bytes and save it as a secondary KB markdown file,
+    tagged with the given topic. Writes to a temp file only for the duration
+    of extraction, then deletes it. Returns the path to the saved .md file."""
     with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
         tmp.write(file_bytes)
         tmp_path = tmp.name
@@ -41,24 +43,26 @@ def ingest_pdf(file_bytes: bytes, original_name: str) -> str:
     finally:
         os.remove(tmp_path)
 
-    return _save_ingested(Path(original_name).stem, text)
+    return _save_ingested(Path(original_name).stem, text, topic)
 
 
-def ingest_youtube(url: str) -> str:
+def ingest_youtube(url: str, topic: str) -> str:
     """Pull the transcript of a YouTube video (if captions exist) and save
-    as markdown. Raises if the video has no transcript available."""
+    as markdown, tagged with the given topic. Raises if the video has no
+    transcript available."""
     video_id = _extract_youtube_id(url)
     ytt_api = YouTubeTranscriptApi()
     transcript_list = ytt_api.fetch(video_id)
     text = " ".join(chunk.text for chunk in transcript_list)
     title = _get_youtube_title(url) or video_id
-    return _save_ingested(title, text)
+    return _save_ingested(title, text, topic)
 
 
-def ingest_url_article(url: str) -> str:
+def ingest_url_article(url: str, topic: str) -> str:
     """Fetch a webpage and extract its main readable text (via <p> tags),
-    then save as markdown. Works for most standard article pages; won't
-    reliably extract content from JS-rendered sites."""
+    then save as markdown, tagged with the given topic. Works for most
+    standard article pages; won't reliably extract content from
+    JS-rendered sites."""
     response = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
     response.raise_for_status()
 
@@ -71,7 +75,7 @@ def ingest_url_article(url: str) -> str:
     if not text:
         raise ValueError(f"Could not extract readable article text from: {url}")
 
-    return _save_ingested(title, f"Source: {url}\n\n{text}")
+    return _save_ingested(title, f"Source: {url}\n\n{text}", topic)
 
 
 def _get_youtube_title(url: str) -> str | None:
@@ -97,9 +101,13 @@ def _extract_youtube_id(url: str) -> str:
     return match.group(1)
 
 
-def _save_ingested(name: str, text: str) -> str:
+def _save_ingested(name: str, text: str, topic: str) -> str:
+    """Save ingested content as markdown, prefixing the filename with the
+    topic slug so chunker.py can tag every resulting chunk with it
+    (e.g. 'leadership__hbr-article.md')."""
     INGESTED_DIR.mkdir(parents=True, exist_ok=True)
+    topic_slug = re.sub(r"[^\w\-]", "_", topic.strip().lower()) or "general"
     safe_name = re.sub(r"[^\w\-]", "_", name)[:60]
-    out_path = INGESTED_DIR / f"{safe_name}.md"
+    out_path = INGESTED_DIR / f"{topic_slug}__{safe_name}.md"
     out_path.write_text(f"# {name}\n\n{text}", encoding="utf-8")
     return str(out_path)
