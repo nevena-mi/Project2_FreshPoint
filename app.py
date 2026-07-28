@@ -132,8 +132,7 @@ tab_about, tab_sources, tab_generate, tab_feedback = st.tabs(
 
 with tab_about:
     st.write(
-        "This is what makes Gonelu sound like you, specifically — anyone "
-        "using this fills in their own background and tone here."
+        "This is what makes Gonelu sound like you, specifically — fill your background and tone here."
     )
 
     about_kb = KnowledgeBase(primary_dir=str(PRIMARY_DIR), secondary_dir=str(SECONDARY_DIR))

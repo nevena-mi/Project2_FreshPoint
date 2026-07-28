@@ -1,7 +1,7 @@
-# FreshPoint Agent Guide
+# Gonelu Agent Guide
 
 ## Project Purpose
-FreshPoint generates branded LinkedIn posts and a monthly newsletter for an AI consultant by combining a personal knowledge base, chunked-and-retrieved secondary sources, and fresh news. `project_structure.md` is the source of truth for scope, and agents should use the relevant Must IDs from that file when scoping work. If a task does not map cleanly to a Must ID, treat it as out of scope unless the user explicitly says otherwise.
+Gonelu generates branded LinkedIn posts and a monthly newsletter for any user by combining a personal knowledge base (entered directly in the app by anyone — not hardcoded to one person), chunked-and-retrieved secondary sources, and fresh news. `project_structure.md` is the source of truth for scope, and agents should use the relevant Must IDs from that file when scoping work. If a task does not map cleanly to a Must ID, treat it as out of scope unless the user explicitly says otherwise.
 
 ## Stack & How To Run
 - Python: tested in this repo with Python 3.14.6.
@@ -34,13 +34,22 @@ FreshPoint generates branded LinkedIn posts and a monthly newsletter for an AI c
   - `topics.md` plus ingested secondary sources under `ingested/`
   - secondary content is chunked and may be retrieved by embeddings
 - `src/prompt_templates.py`
-  - LinkedIn, newsletter, and diagram decision prompts
+  - LinkedIn and newsletter generation prompts
+- `src/editor.py`
+  - second-pass editing checklist run on every draft (generic openers/endings, em-dashes, buzzwords)
 - `src/content_pipeline.py`
   - prompt assembly and post generation flow
 - `src/main.py`
   - CLI entry point
 - `app.py`
-  - Streamlit UI for generation, source ingestion, and feedback
+  - Streamlit UI: "Add about you" (user inputs their own background/tone),
+    "Add Sources" (PDF/article/YouTube ingestion), "Generate & Review"
+    (General Post / Post from News / Newsletter sub-tabs), and
+    "Performance Feedback" (rate posts, feed Good ones into voice examples)
+- `assets/logo.png` + `.streamlit/config.toml`
+  - the real logo and Streamlit's built-in theme config (brand colors) —
+    prefer config.toml over CSS injection for theming; CSS injection has
+    proven unreliable across Streamlit versions in this project
 - `src/chunker.py`
   - deterministic chunking for the secondary KB
 - `src/embeddings.py`
@@ -83,4 +92,3 @@ An agent-assisted change is done only when all of the following are true:
 - Tell the agent whether the card is implementation, review, or documentation.
 - Ask the agent to stay within the card boundary and to report any blocked assumptions before branching out.
 - If a card touches multiple files, keep the changes tightly coupled to that one card and do not pick up adjacent cleanup work.
-
