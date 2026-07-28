@@ -26,7 +26,7 @@ to follow, this is who you are. Write in first person, in your own voice.
 --- WHO YOU ARE AND HOW YOU WRITE ---
 {primary_context}
 
---- OPTIONAL SOURCE MATERIAL FOR THIS POST (use only if it genuinely strengthens the point — don't force it in; if nothing here is relevant, write from who you are above instead) ---
+--- SOURCE MATERIAL RETRIEVED FOR THIS POST (this was specifically selected as relevant to your angle — use it as the concrete grounding for this post, don't default to generic background instead) ---
 {secondary_context}
 
 --- RECENT NEWS ---

@@ -17,9 +17,9 @@
   clients — including CAC 40 accounts. Proof that "soft" psychological
   frameworks can move very hard numbers.
 
-- I ran my own coaching business, Guided Inclination, for two years, and
+- I ran my own coaching business, The Positively Inclined, for two years, and
   hold an ICF ACC certification (300+ hours). Coaching taught me to
-  listen for what people aren't saying — a skill that transfers directly
+  listen for what people aren't saying: a skill that transfers directly
   to product discovery.
 
 - Early in my career, I worked agency-side in Paris on accounts like Air
